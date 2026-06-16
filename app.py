@@ -252,8 +252,18 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    path = r"C:\Users\FATHIR\.cache\kagglehub\datasets\noopurbhatt\retail-black-friday-sales-dataset\versions\1"
-    filepath = os.path.join(path, 'retail_black_friday_sales_100k.csv')
+    import kagglehub
+    local_filename = 'retail_black_friday_sales_100k.csv'
+    # Try loading from local path first (if it exists)
+    if os.path.exists(local_filename):
+        filepath = local_filename
+    elif os.path.exists(os.path.join('data', local_filename)):
+        filepath = os.path.join('data', local_filename)
+    else:
+        # Dynamically download the dataset via kagglehub
+        path = kagglehub.dataset_download("noopurbhatt/retail-black-friday-sales-dataset")
+        filepath = os.path.join(path, local_filename)
+        
     df = pd.read_csv(filepath)
     df.rename(columns={'purchase_date': 'date'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
