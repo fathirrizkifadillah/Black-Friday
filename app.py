@@ -102,6 +102,15 @@ st.markdown("""
         box-shadow: 0 0 10px rgba(0, 173, 181, 0.2);
     }
     
+    /* Responsive Grid for KPI Cards */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+    
     /* Metric Cards with glassmorphism/hover effects */
     .metric-card {
         background-color: #161B22;
@@ -152,6 +161,89 @@ st.markdown("""
         line-height: 1.4;
         border-left: 2px solid #30363D;
         padding-left: 10px;
+    }
+    
+    /* Header layout classes */
+    .header-container {
+        background-color: #161B22;
+        border: 1px solid #30363D;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .header-title {
+        margin-top: 0;
+        color: #00ADB5;
+        font-size: 22px;
+        font-weight: 600;
+    }
+    .header-text {
+        margin-bottom: 0;
+        color: #8B949E;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    /* Mobile sidebar navigation hint */
+    .mobile-filter-tip {
+        display: none;
+        background-color: #161B22;
+        border: 1px dashed #00ADB5;
+        color: #C9D1D9;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* Mobile-first responsiveness queries */
+    @media (max-width: 1200px) {
+        .kpi-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .mobile-filter-tip {
+            display: block;
+        }
+    }
+    @media (max-width: 600px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .metric-card {
+            padding: 12px 8px;
+        }
+        .metric-value {
+            font-size: 18px;
+        }
+        .metric-label {
+            font-size: 9px;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 4px 12px !important;
+            font-size: 12px !important;
+            height: 36px !important;
+        }
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 4px !important;
+            padding: 4px !important;
+        }
+        .header-container {
+            padding: 14px;
+        }
+        .header-title {
+            font-size: 18px;
+        }
+        .header-text {
+            font-size: 12px;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -264,12 +356,15 @@ if st.sidebar.button("Reset Filters", use_container_width=True):
 # ----------------- Header & Context Card -----------------
 
 st.markdown("""
-    <div style="background-color: #161B22; border: 1px solid #30363D; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-        <h2 style="margin-top: 0; color: #00ADB5; font-size: 22px; font-weight: 600;">Black Friday Sales Performance & Customer Segmentation Dashboard</h2>
-        <p style="margin-bottom: 0; color: #8B949E; font-size: 14px; line-height: 1.5;">
+    <div class="mobile-filter-tip">
+        💡 <b>Tip:</b> Tap the <b>&gt;</b> button in the top-left corner to adjust the dashboard filters!
+    </div>
+    <div class="header-container">
+        <h2 class="header-title">Black Friday Sales Performance & Customer Segmentation Dashboard</h2>
+        <p class="header-text">
             This interactive dashboard is designed to analyze 100,000 retail transaction records collected during the Black Friday promotional window (November 24 to December 1, 2025). 
             It translates complex tabular data into actionable business intelligence by monitoring revenue peaks, analyzing promotional discount performance, and classifying customer profiles using K-Means RFM (Recency, Frequency, Monetary) clustering. 
-            Use the collapsible expander filters on the left panel (sidebar) to isolate specific demographics, cities, or payment channels.
+            Use the collapsible filters on the left panel (sidebar) to isolate specific demographics, cities, or payment channels.
         </p>
     </div>
 """, unsafe_allow_html=True)
@@ -292,9 +387,6 @@ with tab1:
     st.subheader("Overview of Business Metrics & Trends")
     st.markdown("<p style='color: #8B949E; margin-bottom: 20px;'>Quick KPI summaries and daily sales performance trends across the target dates.</p>", unsafe_allow_html=True)
     
-    # 1. KPI Cards
-    kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5, kpi_col6 = st.columns(6)
-    
     total_rev = df_filtered['purchase_amount'].sum()
     total_tx = df_filtered['transaction_id'].nunique()
     unique_cust = df_filtered['customer_id'].nunique()
@@ -302,20 +394,35 @@ with tab1:
     avg_disc = df_filtered['discount_pct'].mean()
     total_qty = df_filtered['quantity'].sum()
     
-    with kpi_col1:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Total Revenue</div><div class="metric-value">${total_rev/1e6:.2f}M</div></div>', unsafe_allow_html=True)
-    with kpi_col2:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Transactions</div><div class="metric-value">{total_tx:,}</div></div>', unsafe_allow_html=True)
-    with kpi_col3:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Customers</div><div class="metric-value">{unique_cust:,}</div></div>', unsafe_allow_html=True)
-    with kpi_col4:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Order Size</div><div class="metric-value">${avg_order:.2f}</div></div>', unsafe_allow_html=True)
-    with kpi_col5:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Discount</div><div class="metric-value">{avg_disc:.1f}%</div></div>', unsafe_allow_html=True)
-    with kpi_col6:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Items Sold</div><div class="metric-value">{total_qty:,}</div></div>', unsafe_allow_html=True)
-        
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Render KPI Cards in a responsive CSS Grid
+    st.markdown(f"""
+        <div class="kpi-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value">${total_rev/1e6:.2f}M</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Transactions</div>
+                <div class="metric-value">{total_tx:,}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Customers</div>
+                <div class="metric-value">{unique_cust:,}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Order Size</div>
+                <div class="metric-value">${avg_order:.2f}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Discount</div>
+                <div class="metric-value">{avg_disc:.1f}%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Items Sold</div>
+                <div class="metric-value">{total_qty:,}</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     # 2. Daily Sales Trend
     df_daily = df_filtered.groupby(pd.Grouper(key='date', freq='D')).agg(
@@ -439,7 +546,18 @@ with tab2:
         cat_rev = df_filtered.groupby('product_category')['purchase_amount'].sum().reset_index()
         fig_donut = px.pie(cat_rev, values='purchase_amount', names='product_category', hole=0.4,
                            color_discrete_sequence=COOL_PALETTE)
-        fig_donut.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+        fig_donut.update_layout(
+            template="plotly_dark", 
+            paper_bgcolor="rgba(0,0,0,0)", 
+            plot_bgcolor="rgba(0,0,0,0)",
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.05,
+                xanchor="center",
+                x=0.5
+            )
+        )
         st.plotly_chart(fig_donut, use_container_width=True)
         st.markdown("<p class='chart-caption'><strong>Interpretation:</strong> This donut chart represents the revenue contribution of each product category. Hover over segments to see exact percentages and dollar values. It helps isolate top-performing divisions (like Electronics) from low-performers.</p>", unsafe_allow_html=True)
         
@@ -533,37 +651,82 @@ with tab3:
     
     st.markdown("---")
     
-    st.subheader("Interactive 3D Customer Segments Plot")
+    st.subheader("Interactive Customer Segments Plot")
     
     sample_size = min(len(rfm_filtered), 5000)
     rfm_sample = rfm_filtered.sample(sample_size, random_state=42) if len(rfm_filtered) > 5000 else rfm_filtered
     
-    fig_3d = px.scatter_3d(
-        rfm_sample, 
-        x='recency', 
-        y='frequency', 
-        z='monetary', 
-        color='segment',
-        hover_data=['customer_id'],
-        labels={'recency': 'Recency (Days)', 'frequency': 'Frequency (Qty)', 'monetary': 'Monetary (Spend $)'},
-        color_discrete_map={
-            'Champions/VIPs': '#BC8CFF',
-            'Loyal Shoppers': '#00ADB5',
-            'Occasional Shoppers': '#58A6FF',
-            'At-Risk': '#8B949E'
-        }
+    plot_mode = st.radio(
+        "Visualization Mode",
+        options=["2D Scatter Plot (Recommended for Mobile)", "3D Spatial Plot (Desktop Optimal)"],
+        horizontal=True
     )
-    fig_3d.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        scene = dict(
-            xaxis = dict(title='Recency (Days)', gridcolor="#21262D"),
-            yaxis = dict(title='Frequency', gridcolor="#21262D"),
-            zaxis = dict(title='Spend ($)', gridcolor="#21262D")
+    
+    if plot_mode == "2D Scatter Plot (Recommended for Mobile)":
+        fig_2d = px.scatter(
+            rfm_sample,
+            x='frequency',
+            y='monetary',
+            color='segment',
+            hover_data=['customer_id', 'recency'],
+            labels={'frequency': 'Frequency (Transactions)', 'monetary': 'Monetary (Spend $)', 'recency': 'Recency (Days)'},
+            color_discrete_map={
+                'Champions/VIPs': '#BC8CFF',
+                'Loyal Shoppers': '#00ADB5',
+                'Occasional Shoppers': '#58A6FF',
+                'At-Risk': '#8B949E'
+            }
         )
-    )
-    st.plotly_chart(fig_3d, use_container_width=True)
-    st.markdown("<p class='chart-caption'><strong>Interpretation:</strong> A 3D spatial plot mapping customers based on Recency, Frequency, and Monetary scores. Every dot represents one customer colored by cluster. Use your mouse to rotate and zoom in on specific regions, and hover over dots to see individual customer IDs.</p>", unsafe_allow_html=True)
+        fig_2d.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(title='Frequency (Transactions Count)', gridcolor="#21262D"),
+            yaxis=dict(title='Monetary Spend ($)', gridcolor="#21262D"),
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.15,
+                xanchor="center",
+                x=0.5
+            )
+        )
+        st.plotly_chart(fig_2d, use_container_width=True)
+        st.markdown("<p class='chart-caption'><strong>Interpretation:</strong> A 2D scatter plot mapping customer Frequency (horizontal axis) against Monetary Spend (vertical axis). High-value VIPs and Loyal Shoppers are situated in the upper right quadrant, whereas At-Risk and Occasional Shoppers occupy the lower left. Hover over dots to view specific details.</p>", unsafe_allow_html=True)
+    else:
+        fig_3d = px.scatter_3d(
+            rfm_sample, 
+            x='recency', 
+            y='frequency', 
+            z='monetary', 
+            color='segment',
+            hover_data=['customer_id'],
+            labels={'recency': 'Recency (Days)', 'frequency': 'Frequency (Qty)', 'monetary': 'Monetary (Spend $)'},
+            color_discrete_map={
+                'Champions/VIPs': '#BC8CFF',
+                'Loyal Shoppers': '#00ADB5',
+                'Occasional Shoppers': '#58A6FF',
+                'At-Risk': '#8B949E'
+            }
+        )
+        fig_3d.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            scene = dict(
+                xaxis = dict(title='Recency (Days)', gridcolor="#21262D"),
+                yaxis = dict(title='Frequency', gridcolor="#21262D"),
+                zaxis = dict(title='Spend ($)', gridcolor="#21262D")
+            ),
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.05,
+                xanchor="center",
+                x=0.5
+            )
+        )
+        st.plotly_chart(fig_3d, use_container_width=True)
+        st.markdown("<p class='chart-caption'><strong>Interpretation:</strong> A 3D spatial plot mapping customers based on Recency, Frequency, and Monetary scores. Every dot represents one customer colored by cluster. Use your mouse to rotate and zoom. Note: 3D rotation can be sluggish or difficult to manipulate on touch-screen devices.</p>", unsafe_allow_html=True)
     
     st.subheader("Customer Segmentation Marketing Strategies")
     
