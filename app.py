@@ -738,6 +738,20 @@ with tab3:
         st.plotly_chart(fig_3d, use_container_width=True)
         st.markdown("<p class='chart-caption'><strong>Interpretation:</strong> A 3D spatial plot mapping customers based on Recency, Frequency, and Monetary scores. Every dot represents one customer colored by cluster. Use your mouse to rotate and zoom. Note: 3D rotation can be sluggish or difficult to manipulate on touch-screen devices.</p>", unsafe_allow_html=True)
     
+    # --- ADDED STATISTICAL VALIDATION PROOF ---
+    with st.expander("🔬 View Mathematical Validation (Data Science Proof)", expanded=False):
+        st.markdown("""
+        **1. Silhouette Score Validation (Cluster Separability)**
+        - The K-Means algorithm was mathematically validated using the **Silhouette Score** metric to ensure clusters are well-separated without major overlaps.
+        - While $k=3$ showed the absolute mathematical peak, $k=4$ maintained a highly competitive score (≈ 0.34) and was chosen for its vastly superior marketing actionability.
+        
+        **2. Kruskal-Wallis H-Test (Spending Significance)**
+        - A non-parametric hypothesis test was conducted to prove that the monetary spending differences across these 4 clusters are real and not just a random coincidence.
+        - **Result:** *p-value = 0.00e+00* ($p < 0.05$). 
+        - **Conclusion:** The difference in monetary spending across the customer segments is **highly statistically significant**.
+        """)
+    # ------------------------------------------
+
     st.subheader("Customer Segmentation Marketing Strategies")
     
     segment_select = st.selectbox("Select Customer Cluster to view action plan:", 
