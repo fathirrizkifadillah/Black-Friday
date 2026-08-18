@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  Black-Friday-dashboard:
+  black-briday-dashboard:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: Black-Friday-dashboard
+    container_name: black-briday-dashboard
     ports:
       - "8502:8501"  # Port host : Port container
     volumes:
