@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  Black-Friday-dashboard:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: Black-Friday-dashboard
+    ports:
+      - "8502:8501"  # Port host : Port container
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
